@@ -9,7 +9,7 @@ import transmit from '@adonisjs/transmit/services/main'
 import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
 import { middleware } from './kernel.js'
-import { throttle } from './limiter.js'
+import { apiThrottle, throttle } from './limiter.js'
 
 const AuthController = () => import('#controllers/auth_controller')
 const HealthChecksController = () => import('#controllers/health_checks_controller')
@@ -111,6 +111,7 @@ router
     router.post('/hash', [IntelController, 'hash'])
     router.post('/ssl', [IntelController, 'ssl'])
     router.post('/email', [IntelController, 'email'])
+    router.get('/latency/sample', [IntelController, 'latencySample'])
     router.post('/latency', [IntelController, 'latency'])
     router.post('/url-tracer', [IntelController, 'urlTracer'])
     router.post('/comment', [IntelController, 'comment'])
@@ -118,7 +119,7 @@ router
   })
   .prefix('api/v1/intel')
   .use(middleware.auth())
-  .use(throttle)
+  .use(apiThrottle)
 
 router.get('/health', [HealthChecksController])
 

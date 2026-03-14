@@ -93,6 +93,22 @@ export default class IntelController {
     return response.ok({ result, checkedBy, comments })
   }
 
+  /**
+   * Single latency sample for live monitoring (no lookup recorded).
+   * GET /api/v1/intel/latency/sample?target=...
+   */
+  async latencySample({ auth, request, response }: HttpContext) {
+    await auth.authenticate()
+    const target = typeof request.qs().target === 'string' ? request.qs().target.trim() : ''
+    if (!target || target.length > 2048) {
+      return response.badRequest({ error: 'Invalid or missing target' })
+    }
+
+    const service = new LatencyIntelService()
+    const result = await service.measure(target)
+    return response.ok({ result })
+  }
+
   async urlTracer({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
     const { target } = await request.validateUsing(intelTargetValidator)
