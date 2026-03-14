@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export interface CheckedByEntry {
   userId: string
   userName: string | null
-  userEmail: string
   at: string
 }
 
@@ -29,11 +28,8 @@ export function CheckedBy({ entries, targetLabel = 'This' }: CheckedByProps) {
         <ul className='space-y-1.5 text-sm text-muted-foreground'>
           {entries.map((e) => (
             <li key={`${e.userId}-${e.at}`} className='flex items-center justify-between gap-2'>
-              <span>
-                <span className='font-medium text-foreground'>{e.userName || e.userEmail}</span>
-                {e.userName && (
-                  <span className='ml-1 text-muted-foreground'>({e.userEmail})</span>
-                )}
+              <span className='font-medium text-foreground'>
+                {e.userName ?? 'Anonymous'}
               </span>
               <span className='shrink-0'>
                 {formatDistanceToNow(new Date(e.at), { addSuffix: true })}

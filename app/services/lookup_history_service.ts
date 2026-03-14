@@ -4,7 +4,6 @@ import LookupComment from '#models/lookup_comment'
 export interface CheckedByEntry {
   userId: string
   userName: string | null
-  userEmail: string
   at: string
 }
 
@@ -12,7 +11,6 @@ export interface CommentEntry {
   id: number
   userId: string
   userName: string | null
-  userEmail: string
   body: string
   createdAt: string
 }
@@ -42,7 +40,6 @@ export class LookupHistoryService {
       result.push({
         userId: row.user.id,
         userName: row.user.fullName,
-        userEmail: row.user.email,
         at: row.createdAt.toISO?.() ?? String(row.createdAt),
       })
     }
@@ -61,7 +58,6 @@ export class LookupHistoryService {
       id: row.id,
       userId: row.userId,
       userName: row.user?.fullName ?? null,
-      userEmail: row.user?.email ?? '',
       body: row.body,
       createdAt: row.createdAt.toISO?.() ?? String(row.createdAt),
     }))
@@ -84,7 +80,6 @@ export class LookupHistoryService {
       id: comment.id,
       userId: comment.userId,
       userName: comment.user?.fullName ?? null,
-      userEmail: comment.user?.email ?? '',
       body: comment.body,
       createdAt: comment.createdAt.toISO?.() ?? String(comment.createdAt),
     }

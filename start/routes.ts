@@ -106,13 +106,17 @@ router
 // Intel / OSINT tools API
 router
   .group(() => {
+    router.get('/ip/sample', [IntelController, 'ipSample'])
     router.post('/ip', [IntelController, 'ip'])
+    router.get('/domain/sample', [IntelController, 'domainSample'])
     router.post('/domain', [IntelController, 'domain'])
     router.post('/hash', [IntelController, 'hash'])
+    router.get('/ssl/sample', [IntelController, 'sslSample'])
     router.post('/ssl', [IntelController, 'ssl'])
     router.post('/email', [IntelController, 'email'])
     router.get('/latency/sample', [IntelController, 'latencySample'])
     router.post('/latency', [IntelController, 'latency'])
+    router.get('/url-tracer/sample', [IntelController, 'urlTracerSample'])
     router.post('/url-tracer', [IntelController, 'urlTracer'])
     router.post('/comment', [IntelController, 'comment'])
     router.get('/monitor', [IntelController, 'monitor'])

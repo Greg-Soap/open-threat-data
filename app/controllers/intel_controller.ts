@@ -25,6 +25,22 @@ export default class IntelController {
     return response.ok({ result, checkedBy, comments })
   }
 
+  /**
+   * Single IP lookup sample for monitoring (no lookup recorded).
+   * GET /api/v1/intel/ip/sample?target=...
+   */
+  async ipSample({ auth, request, response }: HttpContext) {
+    await auth.authenticate()
+    const target = typeof request.qs().target === 'string' ? request.qs().target.trim() : ''
+    if (!target || target.length > 64) {
+      return response.badRequest({ error: 'Invalid or missing target' })
+    }
+
+    const service = new IpIntelService()
+    const result = await service.lookup(target)
+    return response.ok({ result })
+  }
+
   async domain({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
     const { target } = await request.validateUsing(intelTargetValidator)
@@ -36,6 +52,22 @@ export default class IntelController {
     const comments = await lookupHistoryService.getComments('domain', target)
 
     return response.ok({ result, checkedBy, comments })
+  }
+
+  /**
+   * Single domain lookup sample for monitoring (no lookup recorded).
+   * GET /api/v1/intel/domain/sample?target=...
+   */
+  async domainSample({ auth, request, response }: HttpContext) {
+    await auth.authenticate()
+    const target = typeof request.qs().target === 'string' ? request.qs().target.trim() : ''
+    if (!target || target.length > 512) {
+      return response.badRequest({ error: 'Invalid or missing target' })
+    }
+
+    const service = new DomainIntelService()
+    const result = await service.lookup(target)
+    return response.ok({ result })
   }
 
   async hash({ auth, request, response }: HttpContext) {
@@ -65,6 +97,24 @@ export default class IntelController {
     const comments = await lookupHistoryService.getComments('ssl', sslTarget)
 
     return response.ok({ result, checkedBy, comments })
+  }
+
+  /**
+   * Single SSL inspection sample for monitoring (no lookup recorded).
+   * GET /api/v1/intel/ssl/sample?target=host:port
+   */
+  async sslSample({ auth, request, response }: HttpContext) {
+    await auth.authenticate()
+    const raw = typeof request.qs().target === 'string' ? request.qs().target.trim() : ''
+    if (!raw || raw.length > 512) {
+      return response.badRequest({ error: 'Invalid or missing target' })
+    }
+    const [host, portStr] = raw.includes(':') ? raw.split(':') : [raw, '443']
+    const port = Number(portStr) || 443
+
+    const service = new SslIntelService()
+    const result = await service.inspect(host, port)
+    return response.ok({ result })
   }
 
   async email({ auth, request, response }: HttpContext) {
@@ -131,6 +181,30 @@ export default class IntelController {
     return response.ok({ result: { ...result, threatCheck }, checkedBy, comments })
   }
 
+  /**
+   * Single URL trace sample for monitoring (no lookup recorded).
+   * GET /api/v1/intel/url-tracer/sample?target=...
+   */
+  async urlTracerSample({ auth, request, response }: HttpContext) {
+    await auth.authenticate()
+    const target = typeof request.qs().target === 'string' ? request.qs().target.trim() : ''
+    if (!target || target.length > 2048) {
+      return response.badRequest({ error: 'Invalid or missing target' })
+    }
+
+    const service = new UrlTracerService()
+    const result = await service.trace(target)
+    let threatCheck = null
+    const urlToCheck = result.finalUrl || result.initialUrl
+    try {
+      const reputationService = new UrlReputationService()
+      threatCheck = await reputationService.check(urlToCheck)
+    } catch {
+      // optional
+    }
+    return response.ok({ result: { ...result, threatCheck } })
+  }
+
   async comment({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
     const { type, target, body } = await request.validateUsing(intelCommentValidator)
@@ -159,7 +233,6 @@ export default class IntelController {
       type: r.type,
       target: r.target,
       userName: r.user?.fullName ?? null,
-      userEmail: r.user?.email,
       createdAt: r.createdAt.toISO?.(),
     }))
 

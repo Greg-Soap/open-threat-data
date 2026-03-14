@@ -9,6 +9,10 @@ export const API_ROUTES = {
     '/audits/recent',
     '/intel/monitor',
     '/intel/latency/sample',
+    '/intel/url-tracer/sample',
+    '/intel/ssl/sample',
+    '/intel/domain/sample',
+    '/intel/ip/sample',
   ] as const,
   POST: [
     '/auth/signup',

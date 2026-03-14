@@ -12,7 +12,6 @@ interface LookupRow {
 	type: string;
 	target: string;
 	userName: string | null;
-	userEmail: string;
 	createdAt: string;
 }
 
@@ -62,7 +61,7 @@ export default function ToolMonitor() {
 											{row.target}
 										</span>
 										<span className="text-muted-foreground">
-											{row.userName || row.userEmail}
+											{row.userName ?? "Anonymous"}
 										</span>
 										<span className="text-muted-foreground shrink-0">
 											{row.createdAt

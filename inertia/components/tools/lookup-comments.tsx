@@ -21,7 +21,6 @@ export interface CommentEntry {
   id: number
   userId: string
   userName: string | null
-  userEmail: string
   body: string
   createdAt: string
 }
@@ -87,12 +86,7 @@ export function LookupComments({
               <li key={c.id} className='rounded-lg border bg-muted/30 p-3'>
                 <div className='flex items-center justify-between gap-2 text-muted-foreground mb-1'>
                   <span className='font-medium text-foreground'>
-                    {c.userName || c.userEmail}
-                    {c.userName && (
-                      <span className='ml-1 font-normal text-muted-foreground'>
-                        ({c.userEmail})
-                      </span>
-                    )}
+                    {c.userName ?? 'Anonymous'}
                   </span>
                   <span className='shrink-0'>
                     {formatDistanceToNow(new Date(c.createdAt), { addSuffix: true })}
