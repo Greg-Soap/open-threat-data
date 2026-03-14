@@ -17,6 +17,7 @@ import { PublicLayout } from '@/components/layouts/public'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 
 export default function Home(props: SharedProps) {
   const isLoggedIn = Boolean(props.isLoggedIn)
@@ -45,6 +46,26 @@ export default function Home(props: SharedProps) {
                 A simple assistant tool for teams: IP and domain intelligence, hash analysis, SSL
                 inspection, email reputation, latency checks, URL tracing, and a shared activity
                 monitor. See who checked what.
+              </p>
+
+              <form
+                action='/lookup'
+                method='get'
+                className='flex flex-col gap-2 sm:flex-row sm:items-center max-w-2xl'
+              >
+                <Input
+                  type='text'
+                  name='q'
+                  placeholder='Paste a hash, URL, domain, IP, or email…'
+                  className='flex-1 min-w-0'
+                  aria-label='Search'
+                />
+                <Button type='submit' size='lg'>
+                  Look up
+                </Button>
+              </form>
+              <p className='text-sm text-muted-foreground'>
+                Try our tools without an account — results and comments are visible to everyone.
               </p>
 
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>

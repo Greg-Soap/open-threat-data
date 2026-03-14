@@ -1,272 +1,160 @@
-# AdonisJS Starter Template
+# Open Threat Data
 
-A modern, full-stack starter template built with AdonisJS and Inertia.js, featuring React, TypeScript, and Tailwind CSS.
+Open source intelligence (OSINT) and threat analysis platform for teams. Run lookups on IPs, domains, hashes, URLs, emails, and SSL endpoints; see who else checked the same target and leave comments (when signed in).
 
-## 🚀 What's Included
+## Features
 
-This starter template provides a solid foundation for building modern web applications with the following features:
+### Tools (dashboard, requires sign-in)
 
-### Backend (AdonisJS)
+- **IP Intelligence** — GeoIP, ASN, abuse reports, reverse DNS, GreyNoise, AlienVault OTX
+- **Domain Intelligence** — WHOIS, DNS records, subdomains (Certificate Transparency)
+- **Hash Analysis** — File hash reputation and malware detection (VirusTotal, MalwareBazaar)
+- **SSL Certificate Inspector** — Validity, issuer, SANs, chain
+- **Email Reputation** — Format, MX resolution, breach check (Have I Been Pwned)
+- **Latency Monitor** — RTT to host or URL
+- **URL Tracer** — Unshorten URLs, redirect chain, threat check (URLhaus, Safe Browsing)
+- **OSINT Monitor** — Team-wide recent lookups
 
-- **Framework**: AdonisJS v6 - A Node.js MVC framework with TypeScript support
-- **Database**: Lucid ORM with SQLite (better-sqlite3) - Easily switchable to PostgreSQL, MySQL, etc.
-- **Authentication**: Complete authentication system with:
-  - User registration
-  - Login/logout
-  - Password reset functionality
-  - Session-based authentication
-  - Password reset tokens
-- **Email**: Mail service configured with React Email templates
-- **Validation**: VineJS for request validation
-- **Security**: Shield middleware for CSRF protection
-- **Static Assets**: Static file serving configured
+### Guest lookup
 
-### Frontend (React + Inertia.js)
+- **Home page search** — Anyone can paste a hash, URL, domain, IP, or email and get results without an account.
+- **Lookup results page** — Shows the same result and “who checked” / comments. Only logged-in users can post comments.
 
-- **Framework**: React 19 with TypeScript
-- **SPA Experience**: Inertia.js for seamless single-page app experience without API complexity
-- **Server-Side Rendering**: SSR enabled for better SEO and initial load performance
-- **Styling**: Tailwind CSS with custom configuration
-- **UI Components**: shadcn/ui components built on Radix UI primitives
-- **Icons**: Lucide React icon library
-- **Build Tool**: Vite 6 for fast development and optimized production builds
+### Stack
 
+- **Backend**: AdonisJS v6, Lucid ORM, VineJS validation
+- **Frontend**: Inertia.js, React 19, TypeScript, Tailwind CSS, shadcn/ui
+- **Database**: PostgreSQL (recommended) or SQLite; set `DATABASE_URL` for PostgreSQL
 
-## 📁 Project Structure
+## Project structure
 
 ```
-starter-template/
+open-threat-data/
 ├── app/
-│   ├── controllers/        # HTTP request handlers
-│   │   ├── auth_controller.ts
-│   │   └── users_controller.ts
-│   ├── middleware/         # HTTP middleware
-│   │   ├── auth_middleware.ts
-│   │   ├── guest_middleware.ts
-│   │   └── silent_auth_middleware.ts
-│   ├── models/             # Database models
-│   │   ├── user.ts
-│   │   └── password_reset.ts
-│   ├── services/           # Business logic services
-│   │   └── email_service.ts
-│   ├── utils/              # Utility functions
-│   └── validators/         # Request validators
-│       └── auth.ts
-├── config/                 # Configuration files
-│   ├── auth.ts
-│   ├── database.ts
-│   ├── inertia.ts
-│   └── ...
-├── database/
-│   └── migrations/         # Database migrations
-│       ├── create_users_table.ts
-│       ├── create_auth_access_tokens_table.ts
-│       └── create_password_resets_table.ts
+│   ├── controllers/          # auth, users, intel, lookup, teams, audits, etc.
+│   ├── models/               # User, LookupHistory, LookupComment, Team, ...
+│   ├── services/             # intel (ip, domain, hash, ssl, email, latency, url), lookup_type_detector, lookup_history, email
+│   └── validators/
+├── config/                   # auth, database, inertia, limiter, mail, shield, ...
+├── database/migrations/      # users, sessions, lookup_history, lookup_comments, teams, rate_limits, ...
 ├── inertia/
-│   ├── app/                # Inertia app setup
-│   │   ├── app.tsx         # Client-side entry
-│   │   └── ssr.tsx        # Server-side rendering
-│   ├── pages/              # React page components
-│   │   └── home.tsx
-│   ├── emails/             # React Email templates
-│   └── css/                # Global styles
+│   ├── app/                  # React app entry
+│   ├── pages/                # home, login, signup, dashboard, tools/*, lookup, settings, teams
+│   ├── components/           # layouts, ui, tools (checked-by, lookup-comments)
+│   └── emails/               # React Email templates
 ├── resources/
-│   ├── js/                 # Additional JavaScript/TypeScript
-│   ├── css/                # CSS files
-│   └── views/              # Edge templates
-│       └── inertia_layout.edge
-├── start/
-│   ├── routes.ts           # Application routes
-│   ├── kernel.ts          # Middleware configuration
-│   ├── health.ts          # Health check configuration
-│   └── env.ts             # Environment variable validation
-└── tests/                  # Test files
-    ├── bootstrap.ts        # Test configuration
-    ├── functional/         # Functional/integration tests
-    │   ├── auth.spec.ts   # Authentication tests
-    │   └── health.spec.ts # Health check tests
-    └── unit/              # Unit tests
-        └── user.spec.ts   # User model tests
-
+│   ├── css/                  # app.css (Tailwind)
+│   └── views/                # Edge layout for Inertia
+└── start/
+    ├── routes.ts
+    ├── env.ts                # env validation
+    └── health.ts
 ```
 
-## 🛠️ Getting Started
+## Getting started
 
 ### Prerequisites
 
-- Node.js 22+ 
+- Node.js 22+
 - npm 10+
 
-### Quick Setup (Recommended)
+### Quick setup
 
-The easiest way to get started is using the provided setup script:
-
-**On macOS/Linux:**
 ```bash
-# Make the script executable (if needed)
-chmod +x setup.sh
-
-# Run the setup script
+chmod +x setup.sh   # macOS/Linux
 ./setup.sh
-```
-
-After running the setup script, start the development server:
-```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:3333`
+App: `http://localhost:3333`
 
-### Manual Installation
+### Manual setup
 
-If you prefer to set up manually:
+1. **Install and env**
 
-1. Install dependencies:
-```bash
-npm install
-```
+   ```bash
+   npm install
+   cp .env.example .env
+   node ace generate:key
+   ```
 
-2. Set up environment variables:
-```bash
-cp .env.example .env
-```
+2. **Database**
 
-3. Generate the application key:
-```bash
-node ace generate:key
-```
+   - **PostgreSQL**: set `DATABASE_URL` in `.env` (e.g. `postgresql://user:pass@host:port/db`). Then run migrations.
+   - **SQLite**: leave `DATABASE_URL` unset; SQLite is used automatically.
 
-4. Run database migrations:
-```bash
-node ace migration:run
-```
+   ```bash
+   node ace migration:run
+   ```
 
-5. (Optional) Seed the database with sample users:
-```bash
-node ace db:seed
-```
+3. **Optional**: seed users
 
-6. Start the development server:
-```bash
-npm run dev
-``` 
+   ```bash
+   node ace db:seed
+   ```
 
+4. **Run**
 
-### Features
+   ```bash
+   npm run dev
+   ```
 
-- **User Registration** - Sign up with email and password
-- **Login/Logout** - Session-based authentication with remember me support
-- **Password Reset** - Forgot password flow with email tokens
-- **Session Management** - Secure session handling with CSRF protection
-- **Password Security** - Automatic password hashing using scrypt
+## Environment variables
 
-### Authentication Details
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Server port (default `3333`). On Railway, use the injected `PORT`. |
+| `HOST` | Host for URLs (e.g. `localhost` or your domain). |
+| `APP_KEY` | Required; generate with `node ace generate:key`. |
+| `DATABASE_URL` | Optional. When set, PostgreSQL is used; otherwise SQLite. |
+| `SESSION_DRIVER` | `cookie` or `memory`. |
+| `LIMITER_STORE` | `database` or `memory` for rate limiting. |
 
-- **Session-based authentication** using AdonisJS session guards
-- **Password hashing** handled automatically via Lucid ORM hooks
-- **CSRF protection** enabled for all POST/PUT/PATCH/DELETE requests
-- **Remember me tokens** supported for persistent sessions
-- **Password reset tokens** expire after 1 hour
+**OSINT / threat intel (optional):**
 
-All authentication endpoints are prefixed with `/api/v1/auth`. See the API documentation at `/docs` for detailed endpoint specifications.
+- `VIRUSTOTAL_API_KEY`, `ABUSEIPDB_API_KEY`, `MALWAREBAZAAR_API_KEY`, `URLHAUS_API_KEY` (abuse.ch)
+- `GOOGLE_SAFEBROWSING_API_KEY`, `HIBP_API_KEY`, `GREYNOISE_API_KEY`, `OTX_API_KEY`
 
+Tools still run without keys but may return partial or “no key” results. See `.env.example` for full list and comments.
 
+**Auth / email:**
 
-## 📧 Email Templates
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` for Google OAuth
+- `SMTP_*`, `FROM_EMAIL`, etc. for mail
 
-Email templates are built with React Email and located in `inertia/emails/`. The email service is configured in `app/services/email_service.ts`.
+## Deployment (e.g. Railway)
 
-## 🗄️ Database
+1. Set env in the host (including `DATABASE_URL` for PostgreSQL and `PORT` if the host injects it).
+2. Build and run:
 
-The project uses SQLite by default (configured in `config/database.ts`). To switch to another database:
+   ```bash
+   npm run build
+   node ace migration:run
+   npm start
+   ```
 
-1. Install the appropriate driver (e.g., `pg` for PostgreSQL)
-2. Update `config/database.ts` with your connection details
-3. Update `.env` with your database credentials
+Railway sets `PORT` automatically; the app already uses it from env.
 
-## 🧪 Testing
+## API and docs
 
-This project includes comprehensive test coverage using Japa test runner with AdonisJS testing utilities.
+- **RapiDoc**: `GET /docs` (interactive API docs).
+- **Swagger JSON**: `GET /swagger`.
 
-### Test Suites
+Auth and intel endpoints live under `/api/v1/auth` and `/api/v1/intel`. Guest lookup is a single public route: `GET /lookup?q=<target>`.
 
-Tests are organized into two suites:
+## Testing
 
-- **Unit tests** (`tests/unit/`) - Fast, isolated tests for individual components
-  - User model tests (password hashing, credential verification)
-  - Utility function tests
-  
-- **Functional tests** (`tests/functional/`) - Integration tests with HTTP requests
-  - Authentication endpoints (signup, login, logout, password reset)
-  - Health check endpoints
-  - Full request/response cycle testing
-
-### Running Tests
-
-Run all tests:
 ```bash
 npm test
 ```
 
+## Google OAuth2
 
-## 📚 API Documentation
+1. [Google Cloud Console](https://console.cloud.google.com/) → project → APIs & Services → Credentials.
+2. OAuth consent screen and scopes as needed.
+3. Create OAuth client ID (Web). Redirect URI: `http://localhost:3333/google/callback` (or your production URL).
+4. Put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`. Production: use production callback URL and client credentials.
 
-The project includes automatic API documentation using Swagger:
-- **API Docs UI**: `GET /docs` - Interactive API documentation (RapiDoc)
-
-The Swagger configuration is in `config/swagger.ts`. API documentation is automatically generated from your routes and can be customized with additional metadata.
-
-## 🔧 Configuration
-
-Key configuration files:
-- `config/auth.ts` - Authentication settings
-- `config/database.ts` - Database connections
-- `config/inertia.ts` - Inertia.js settings
-- `config/mail.ts` - Email configuration
-- `config/shield.ts` - Security middleware (CSRF, CSP, etc.)
-- `config/session.ts` - Session configuration
-- `adonisrc.ts` - AdonisJS application configuration
-- `.env.test` - Test environment variables
-
-
-## 🚀 Deployment
-
-1. Build the application:
-```bash
-npm run build
-```
-
-2. Set production environment variables
-
-3. Run migrations:
-```bash
-node ace migration:run
-```
-
-4. Start the server:
-```bash
-npm start
-```
-
-## 📄 License
+## License
 
 UNLICENSED
-
-## 📄 Google OAuth2 Setup
-[YouTube Video](https://www.youtube.com/shorts/WABhO9KsOpU)
-
-To setup Google OAuth2, you need to:
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)  
-2. Create or have a new project in the Google Cloud Console
-2. Open the side bar and select "API & Services"
-4. Select Credentials and then OAuth Consent Screen
-5. Click data acess in the sidebar, click add or remove scopes and then select the first 2 scopes
-6. Create a new client ID and client secret and copy the client ID and client secret to the `.env` file
-7. Set the redirect URI to `http://localhost:3333/google/callback`. This should match the callback URL in the `.env` and ally.ts file file
-8. In production, don't forget to set the callback URL to the production URL and the client ID and client secret to the production values and publish the app in the audience tab.
-
-
-
-
-

@@ -17,9 +17,13 @@ const UsersController = () => import('#controllers/users_controller')
 const SessionsController = () => import('#controllers/sessions_controller')
 const AuditsController = () => import('#controllers/audits_controller')
 const IntelController = () => import('#controllers/intel_controller')
+const LookupController = () => import('#controllers/lookup_controller')
 
 router.on('/').renderInertia('home')
 router.on('/home').renderInertia('home')
+
+// Public lookup (guest + auth): paste anything → results + comments (comment form only when logged in)
+router.get('/lookup', [LookupController, 'show'])
 
 // Guest routes
 router
