@@ -1,27 +1,25 @@
+import env from "#start/env";
 import { BaseSchema } from "@adonisjs/lucid/schema";
 
 export default class extends BaseSchema {
 	public async up() {
+		// Only run PostgreSQL extensions when using PostgreSQL
+		if (!env.get("DATABASE_URL")) return;
+
 		this.schema.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
 
-		//enables for better text indexing and allows for similarity func
-		//    SELECT * FROM artists
-		//    WHERE SIMILARITY(name,'Claud Monay') > 0.4 ;
-		// visit https://www.freecodecamp.org/news/fuzzy-string-matching-with-postgresql/
-		this.schema.raw("CREATE EXTENSION IF NOT EXISTS  pg_trgm;");
+		// enables for better text indexing and allows for similarity func
+		this.schema.raw("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
 
-		// enables for geospatial queries
-		this.schema.raw("CREATE EXTENSION postgis;");
+		// enables for geospatial queries (optional; skip if not available e.g. on Railway)
+		this.schema.raw(
+			"DO $$ BEGIN CREATE EXTENSION IF NOT EXISTS postgis; EXCEPTION WHEN OTHERS THEN NULL; END $$"
+		);
 
 		// to generate short ids
 		this.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
 
 		// enhances fuzzy matching
-		/**
-    SELECT * FROM artists
-    WHERE nationality IN ('American', 'British')
-    AND SOUNDEX(name) = SOUNDEX('Damian Hurst');
-    */
 		this.schema.raw("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;");
 
 		this.schema.raw(`CREATE OR REPLACE FUNCTION nanoid(size int DEFAULT 12, alphabet text DEFAULT '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
@@ -62,6 +60,7 @@ export default class extends BaseSchema {
 	}
 
 	public async down() {
+		if (!env.get("DATABASE_URL")) return;
 		this.schema.raw('DROP EXTENSION IF EXISTS "uuid-ossp"');
 		this.schema.raw("DROP EXTENSION IF EXISTS pg_trgm;");
 		this.schema.raw("DROP EXTENSION IF EXISTS fuzzystrmatch;");
